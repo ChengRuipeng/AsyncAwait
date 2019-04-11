@@ -1,6 +1,6 @@
 //
 //  ViewController.m
-//  RJIterator
+//  AsyncAwait
 //
 //  Created by renjinkui on 2018/4/13.
 //  Copyright © 2018年 renjinkui. All rights reserved.
@@ -8,8 +8,8 @@
 
 #import "ViewController.h"
 #import "Tests.h"
-#import "RJIterator-Swift.h"
-#import "RJIterator.h"
+#import "AsyncAwait-Swift.h"
+#import "AsyncAwait.h"
 #import "UserInfoViewController.h"
 
 @interface ViewController ()

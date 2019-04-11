@@ -1,6 +1,6 @@
-//
-//  RJIterator.h
-//  RJIterator
+ //
+//  AsyncAwait.h
+//  AsyncAwait
 //
 //  Created by renjinkui on 2018/4/12.
 //  Copyright © 2018年 JK. All rights reserved.
@@ -9,7 +9,7 @@
 #import <Foundation/Foundation.h>
 
 @class RJResult;
-@class RJIterator;
+@class AsyncAwait;
 @class RJAsyncEpilog;
 
 id _Nullable rj_yield(id _Nullable value);
@@ -21,14 +21,14 @@ typedef id _Nullable (*RJGenetarorFunc)(id _Nullable);
 typedef void (^RJAsyncCallback)(id _Nullable value, id _Nullable error);
 typedef void (^RJAsyncClosure)(RJAsyncCallback _Nonnull callback);
 
-@interface RJIterator : NSObject
+@interface AsyncAwait : NSObject
 {
     int *_ev_leave;
     int *_ev_entry;
     BOOL _ev_entry_valid;
     void *_stack;
     int _stack_size;
-    RJIterator * _nest;
+    AsyncAwait * _nest;
     RJGenetarorFunc _func;
     id _target;
     SEL _selector;

@@ -1,6 +1,6 @@
 //
 //  TestsSwift.swift
-//  RJIterator
+//  AsyncAwait
 //
 //  Created by renjinkui on 2018/4/14.
 //  Copyright © 2018年 renjinkui. All rights reserved.
@@ -38,9 +38,9 @@ func count_7_9(_: Any?) -> Any? {
 }
 
 func count(_: Any?) -> Any? {
-    rj_yield(RJIterator.init(withFunc: count_1_3, arg: nil))
-    rj_yield(RJIterator.init(withFunc: count_4_5, arg: nil))
-    rj_yield(RJIterator.init(withFunc: count_7_9, arg: nil))
+    rj_yield(AsyncAwait.init(withFunc: count_1_3, arg: nil))
+    rj_yield(AsyncAwait.init(withFunc: count_4_5, arg: nil))
+    rj_yield(AsyncAwait.init(withFunc: count_7_9, arg: nil))
     return nil
 }
 
@@ -64,10 +64,10 @@ class TestsSwift: NSObject {
 
     static func test0() {
         print("************************ Begin test0 *******************************");
-        var it: RJIterator;
+        var it: AsyncAwait;
         var r: RJResult;
         
-        it = RJIterator.init(withFunc: count, arg:nil)
+        it = AsyncAwait.init(withFunc: count, arg:nil)
         r = it.next()
         print("value: \(r.value), done:\(r.done)")
         r = it.next()
@@ -104,10 +104,10 @@ class TestsSwift: NSObject {
     
     static func test1() {
         print("************************ Begin test1 *******************************");
-        var it: RJIterator;
+        var it: AsyncAwait;
         var r: RJResult;
         
-        it = RJIterator.init(withFunc: talk, arg: "爱德华")
+        it = AsyncAwait.init(withFunc: talk, arg: "爱德华")
         r = it.next()
         print("value: \(r.value), done:\(r.done)")
         r = it.next()
@@ -160,10 +160,10 @@ class TestsSwift: NSObject {
     
     static func test2() {
         print("************************ Begin test2 *******************************");
-        var it: RJIterator;
+        var it: AsyncAwait;
         var r: RJResult;
         
-        it = RJIterator.init(target: TestsSwift.init(), selector: #selector(Fibonacci), args: nil)
+        it = AsyncAwait.init(target: TestsSwift.init(), selector: #selector(Fibonacci), args: nil)
         
         repeat {
             r = it.next()
@@ -180,7 +180,7 @@ class TestsSwift: NSObject {
         rj_yield("Hello, I know you name:\(name), age:\(age), you want some data");
         rj_yield("Fibonacci:");
         print("==in dataBox/will return Fibonacci");
-        rj_yield(RJIterator.init(target: self, selector: #selector(Fibonacci), args: nil));
+        rj_yield(AsyncAwait.init(target: self, selector: #selector(Fibonacci), args: nil));
         rj_yield("Random Data:");
         print("==in dataBox/will return Random Data");
         rj_yield("🐶");
@@ -193,13 +193,13 @@ class TestsSwift: NSObject {
     
     @objc func dataBox2(name: String, age: NSNumber) -> String {
         //更深嵌套
-        rj_yield(RJIterator.init(target: TestsSwift.init(), selector: #selector(dataBox(name:age:)), args: ["RJK", 28]))
+        rj_yield(AsyncAwait.init(target: TestsSwift.init(), selector: #selector(dataBox(name:age:)), args: ["RJK", 28]))
         
         print("==in dataBox2/enter");
         rj_yield("Hello, I know you name:\(name), age:\(age), you want some data");
         rj_yield("Fibonacci:");
         print("==in dataBox2/will return Fibonacci");
-        rj_yield(RJIterator.init(target: self, selector: #selector(Fibonacci), args: nil));
+        rj_yield(AsyncAwait.init(target: self, selector: #selector(Fibonacci), args: nil));
         rj_yield("Random Data:");
         print("==in dataBox2/will return Random Data");
         rj_yield("🐶");
@@ -212,10 +212,10 @@ class TestsSwift: NSObject {
     
     static func test3() {
         print("************************ Begin test3 *******************************");
-        var it: RJIterator;
+        var it: AsyncAwait;
         var r: RJResult;
         
-        it = RJIterator.init(target: TestsSwift.init(), selector: #selector(dataBox(name:age:)), args: ["RJK", 28]);
+        it = AsyncAwait.init(target: TestsSwift.init(), selector: #selector(dataBox(name:age:)), args: ["RJK", 28]);
         
         repeat {
             r = it.next()
@@ -226,10 +226,10 @@ class TestsSwift: NSObject {
     
     static func test4() {
         print("************************ Begin test4 *******************************");
-        var it: RJIterator;
+        var it: AsyncAwait;
         var r: RJResult;
         
-        it = RJIterator.init(target: TestsSwift.init(), selector: #selector(dataBox2(name:age:)), args: ["Walt White", 48]);
+        it = AsyncAwait.init(target: TestsSwift.init(), selector: #selector(dataBox2(name:age:)), args: ["Walt White", 48]);
         
         repeat {
             r = it.next()
@@ -240,10 +240,10 @@ class TestsSwift: NSObject {
     
     static func test5() {
         print("************************ Begin test5 *******************************");
-        var it: RJIterator;
+        var it: AsyncAwait;
         var r: RJResult;
         
-        it = RJIterator.init(standardBlock: {
+        it = AsyncAwait.init(standardBlock: {
             print("Hello");
             rj_yield("🐶");
             rj_yield([]);
@@ -256,7 +256,7 @@ class TestsSwift: NSObject {
             print("value: \(r.value), done:\(r.done)")
         }while(!r.done)
         
-        it = RJIterator.init(block: { (name) -> Any? in
+        it = AsyncAwait.init(block: { (name) -> Any? in
             print("Hello \(name)");
             rj_yield("🐶");
             rj_yield([]);
@@ -291,10 +291,10 @@ class TestsSwift: NSObject {
     
     static func test6() {
         print("************************ Begin test6 *******************************");
-        var it: RJIterator;
+        var it: AsyncAwait;
         var r: RJResult;
         
-        it = RJIterator.init(target: TestsSwift.self, selector: #selector(ClassFibonacci), args: nil)
+        it = AsyncAwait.init(target: TestsSwift.self, selector: #selector(ClassFibonacci), args: nil)
         
         repeat {
             r = it.next()
@@ -311,10 +311,10 @@ class TestsSwift: NSObject {
     
     static func test7() {
         print("************************ Begin test7 *******************************");
-        var it: RJIterator;
+        var it: AsyncAwait;
         var r: RJResult;
 
-        it = RJIterator.init(target: TestsSwift.self, selector: #selector(talk2(name:)), args: ["第一帅"])
+        it = AsyncAwait.init(target: TestsSwift.self, selector: #selector(talk2(name:)), args: ["第一帅"])
         r = it.next();
         print("value: \(r.value), done:\(r.done)")
         r = it.next("JK");

@@ -1,6 +1,6 @@
 //
 //  Tests.m
-//  RJIterator
+//  AsyncAwait
 //
 //  Created by renjinkui on 2018/4/13.
 //  Copyright © 2018年 JK. All rights reserved.
@@ -8,7 +8,7 @@
 
 #import "Tests.h"
 #import <UIKit/UIKit.h>
-#import "RJIterator.h"
+#import "AsyncAwait.h"
 
 static NSString* talk(NSString *name) {
     rj_yield([NSString stringWithFormat:@"Hello %@, How are you?", name]);
@@ -35,10 +35,10 @@ static NSString* talk(NSString *name) {
 
 + (void)test1 {
     NSLog(@"************************ Begin %s *******************************", __func__);
-    RJIterator *it = nil;
+    AsyncAwait *it = nil;
     RJResult *r = nil;
     
-    it = [[RJIterator alloc] initWithFunc:talk arg:@"乌卡卡"];
+    it = [[AsyncAwait alloc] initWithFunc:talk arg:@"乌卡卡"];
     r = [it next];
     NSLog(@"== value: %@, done:%@", r.value, r.done ? @"YES" : @"NO");
     r = [it next];
@@ -76,10 +76,10 @@ static NSString* talk(NSString *name) {
 
 + (void)test2 {
     NSLog(@"************************ Begin %s *******************************", __func__);
-    RJIterator *it = nil;
+    AsyncAwait *it = nil;
     RJResult *r = nil;
     
-    it = [[RJIterator alloc] initWithTarget:[self new] selector:@selector(Fibonacci)];
+    it = [[AsyncAwait alloc] initWithTarget:[self new] selector:@selector(Fibonacci)];
     for (int i = 0; i < 22; ++i) {
         r = [it next];
         NSLog(@"== value: %@, done:%@", r.value, r.done ? @"YES" : @"NO");
@@ -94,7 +94,7 @@ static NSString* talk(NSString *name) {
     rj_yield([NSString stringWithFormat:@"Hello, I know you name:%@, age:%@, you want some data", name, age]);
     rj_yield(@"Fibonacci:");
     NSLog(@"==in dataBox/will return Fibonacci");
-    rj_yield([[RJIterator alloc] initWithTarget:self selector:@selector(Fibonacci)]);
+    rj_yield([[AsyncAwait alloc] initWithTarget:self selector:@selector(Fibonacci)]);
     rj_yield(@"Random Data:");
     NSLog(@"==in dataBox/will return Random Data");
     rj_yield(@"🐶");
@@ -106,13 +106,13 @@ static NSString* talk(NSString *name) {
 
 //更深嵌套
 - (id)dataBox2:(NSString *)name age:(NSNumber *)age {
-    rj_yield([[RJIterator alloc] initWithTarget:self selector:@selector(dataBox:age:), name, age]);
+    rj_yield([[AsyncAwait alloc] initWithTarget:self selector:@selector(dataBox:age:), name, age]);
     
     NSLog(@"==in dataBox2/enter");
     rj_yield([NSString stringWithFormat:@"Hello, I know you name:%@, age:%@, you want some data", name, age]);
     rj_yield(@"Fibonacci:");
     NSLog(@"==in dataBox2/will return Fibonacci");
-    rj_yield([[RJIterator alloc] initWithTarget:self selector:@selector(Fibonacci)]);
+    rj_yield([[AsyncAwait alloc] initWithTarget:self selector:@selector(Fibonacci)]);
     rj_yield(@"Random Data:");
     NSLog(@"==in dataBox2/will return Random Data");
     rj_yield(@"🐶");
@@ -124,10 +124,10 @@ static NSString* talk(NSString *name) {
 
 + (void)test3 {
     NSLog(@"************************ Begin %s *******************************", __func__);
-    RJIterator *it = nil;
+    AsyncAwait *it = nil;
     RJResult *r = nil;
     
-    it = [[RJIterator alloc] initWithTarget:[self new] selector:@selector(dataBox:age:), @"大表哥", @28];
+    it = [[AsyncAwait alloc] initWithTarget:[self new] selector:@selector(dataBox:age:), @"大表哥", @28];
     do {
         r = [it next];
         NSLog(@"== value: %@, done:%@", r.value, r.done ? @"YES" : @"NO");
@@ -138,10 +138,10 @@ static NSString* talk(NSString *name) {
 
 + (void)test4 {
     NSLog(@"************************ Begin %s *******************************", __func__);
-    RJIterator *it = nil;
+    AsyncAwait *it = nil;
     RJResult *r = nil;
     
-    it = [[RJIterator alloc] initWithTarget:[self new] selector:@selector(dataBox2:age:), @"古德曼", @30];
+    it = [[AsyncAwait alloc] initWithTarget:[self new] selector:@selector(dataBox2:age:), @"古德曼", @30];
     do {
         r = [it next];
         NSLog(@"== value: %@, done:%@", r.value, r.done ? @"YES" : @"NO");
@@ -152,10 +152,10 @@ static NSString* talk(NSString *name) {
 
 + (void)test5 {
     NSLog(@"************************ Begin %s *******************************", __func__);
-    RJIterator *it = nil;
+    AsyncAwait *it = nil;
     RJResult *r = nil;
     
-    it = [[RJIterator alloc] initWithBlock:^{
+    it = [[AsyncAwait alloc] initWithBlock:^{
         rj_yield(@100);
         rj_yield(@101);
         rj_yield(@102);
@@ -169,7 +169,7 @@ static NSString* talk(NSString *name) {
     
     NSLog(@"************************");
     
-    it = [[RJIterator alloc] initWithBlock:^(NSString *name, NSNumber *age) {
+    it = [[AsyncAwait alloc] initWithBlock:^(NSString *name, NSNumber *age) {
         rj_yield([NSString stringWithFormat:@"Hello %@, your age is:%@", name, age]);
         rj_yield(@100);
         rj_yield(@101);
@@ -187,10 +187,10 @@ static NSString* talk(NSString *name) {
 
 + (void)test6 {
     NSLog(@"************************ Begin %s *******************************", __func__);
-    RJIterator *it = nil;
+    AsyncAwait *it = nil;
     RJResult *r = nil;
     
-    it = [[RJIterator alloc] initWithBlock:^(NSString *name, NSNumber *age) {
+    it = [[AsyncAwait alloc] initWithBlock:^(NSString *name, NSNumber *age) {
         rj_yield([NSString stringWithFormat:@"Hello %@, your age is:%@", name, age]);
         rj_yield(@100);
         rj_yield(@101);
@@ -225,10 +225,10 @@ static NSString* talk(NSString *name) {
 
 + (void)test7 {
     NSLog(@"************************ Begin %s *******************************", __func__);
-    RJIterator *it = nil;
+    AsyncAwait *it = nil;
     RJResult *r = nil;
     
-    it = [[RJIterator alloc] initWithTarget:self selector:@selector(ClassFibonacci)];
+    it = [[AsyncAwait alloc] initWithTarget:self selector:@selector(ClassFibonacci)];
     for (int i = 0; i < 22; ++i) {
         r = [it next];
         NSLog(@"== value: %@, done:%@", r.value, r.done ? @"YES" : @"NO");
@@ -244,10 +244,10 @@ static NSString* talk(NSString *name) {
 
 + (void)test8 {
     NSLog(@"************************ Begin %s *******************************", __func__);
-    RJIterator *it = nil;
+    AsyncAwait *it = nil;
     RJResult *r = nil;
     
-    it = [[RJIterator alloc] initWithTarget:self selector:@selector(talk2:), @"第一帅"];
+    it = [[AsyncAwait alloc] initWithTarget:self selector:@selector(talk2:), @"第一帅"];
     r = [it next];
     NSLog(@"== value: %@, done:%@", r.value, r.done ? @"YES" : @"NO");
     

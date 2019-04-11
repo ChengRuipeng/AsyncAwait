@@ -1,28 +1,28 @@
  //
-//  RJIterator.m
-//  RJIterator
+//  AsyncAwait.m
+//  AsyncAwait
 //
 //  Created by renjinkui on 2018/4/12.
 //  Copyright © 2018年 JK. All rights reserved.
 //
 
-#import "RJIterator.h"
+#import "AsyncAwait.h"
 #import <objc/message.h>
 #import <objc/runtime.h>
 #import <setjmp.h>
 #import <pthread.h>
 
 #if DEMO
-#import "RJIterator-Swift.h"
+#import "AsyncAwait-Swift.h"
 #else
-#import <RJIterator/RJIterator-Swift.h>
+#import <AsyncAwait/AsyncAwait-Swift.h>
 #endif
 
 #if __has_feature(objc_arc)
 //ARC下存在跳转导致的编译器生成的释放函数执行不到的问题
 //MRC就可以回避编译器的这种 “干扰”
 //以pod 安装可正常运行,不用手动配MRC
-#error RJIterator Must be compiled with MRC
+#error AsyncAwait Must be compiled with MRC
 #endif
 
 #define DEFAULT_STACK_SIZE (256 * 1024)
@@ -98,25 +98,25 @@ static NSMethodSignature *NSMethodSignatureForBlock(id block);
 }
 @end
 
-#pragma mark - RJIteratorStack
+#pragma mark - AsyncAwaitStack
 
 static pthread_key_t iterator_stack_key;
 static void destroy_iterator_stack(void * stack) {
     CFRelease((CFArrayRef)stack);
 }
 
-@interface RJIteratorStack: NSObject
-+ (void)push:(RJIterator *)iterator;
-+ (RJIterator *)pop;
-+ (RJIterator *)top;
+@interface AsyncAwaitStack: NSObject
++ (void)push:(AsyncAwait *)iterator;
++ (AsyncAwait *)pop;
++ (AsyncAwait *)top;
 @end
 
-@implementation RJIteratorStack
+@implementation AsyncAwaitStack
 + (void)load {
     pthread_key_create(&iterator_stack_key, destroy_iterator_stack);
 }
 
-+ (void)push:(RJIterator *)iterator {
++ (void)push:(AsyncAwait *)iterator {
     CFMutableArrayRef stack = pthread_getspecific(iterator_stack_key);
     if (!stack) {
         stack = CFArrayCreateMutable(kCFAllocatorSystemDefault, 16, &kCFTypeArrayCallBacks);
@@ -125,11 +125,11 @@ static void destroy_iterator_stack(void * stack) {
     CFArrayAppendValue(stack, (void *)iterator);
 }
 
-+ (RJIterator *)pop {
++ (AsyncAwait *)pop {
     CFMutableArrayRef stack = pthread_getspecific(iterator_stack_key);
     CFIndex count = stack ? CFArrayGetCount(stack) : 0;
     if (count > 0) {
-        RJIterator *iterator = (RJIterator *)CFArrayGetValueAtIndex(stack, count - 1);
+        AsyncAwait *iterator = (AsyncAwait *)CFArrayGetValueAtIndex(stack, count - 1);
         [iterator retain];
         CFArrayRemoveValueAtIndex(stack, count - 1);
         return iterator.autorelease;
@@ -137,27 +137,27 @@ static void destroy_iterator_stack(void * stack) {
     return nil;
 }
 
-+ (RJIterator *)top {
++ (AsyncAwait *)top {
     CFMutableArrayRef stack = pthread_getspecific(iterator_stack_key);
     CFIndex count = stack ? CFArrayGetCount(stack) : 0;
     if (count > 0) {
-        RJIterator *iterator = (RJIterator *)CFArrayGetValueAtIndex(stack, count - 1);
+        AsyncAwait *iterator = (AsyncAwait *)CFArrayGetValueAtIndex(stack, count - 1);
         return iterator;
     }
     return nil;
 }
 @end
 
-#pragma mark - RJIterator
+#pragma mark - AsyncAwait
 
-@interface RJIterator()
-@property (nonatomic, strong) RJIterator * nest;
+@interface AsyncAwait()
+@property (nonatomic, strong) AsyncAwait * nest;
 @property (nonatomic, strong) id value;
 @property (nonatomic, strong) id error;
 @property (nonatomic, assign) BOOL done;
 @end
 
-@implementation RJIterator
+@implementation AsyncAwait
 @synthesize nest = _nest;
 @synthesize value = _value;
 @synthesize error = _error;
@@ -357,7 +357,7 @@ static void destroy_iterator_stack(void * stack) {
         return [RJResult resultWithValue:_value error:_error done:_done];
     }
     
-    [RJIteratorStack push:self];
+    [AsyncAwaitStack push:self];
     
     //设置跳转返回点
     int leave_value = setjmp(_ev_leave);
@@ -404,7 +404,7 @@ static void destroy_iterator_stack(void * stack) {
         _done = YES;
     }
     
-    [RJIteratorStack pop];
+    [AsyncAwaitStack pop];
     
     return [RJResult resultWithValue:_value error:_error done:_done];
 }
@@ -466,7 +466,7 @@ static void destroy_iterator_stack(void * stack) {
     id yield_value = value;
     if ([value isKindOfClass:self.class]) {
         //嵌套的迭代器
-        self.nest = (RJIterator *)value;
+        self.nest = (AsyncAwait *)value;
     }
     
     next: {
@@ -496,7 +496,7 @@ static void destroy_iterator_stack(void * stack) {
 
 
 id rj_yield(id value) {
-    RJIterator *iterator = [RJIteratorStack top];
+    AsyncAwait *iterator = [AsyncAwaitStack top];
     return [iterator yield: value];
 }
 
@@ -511,7 +511,7 @@ RJResult * _Nonnull rj_await(id _Nullable value) {
 
 
 RJAsyncEpilog * rj_async(dispatch_block_t block) {
-    RJIterator *  iterator = [[RJIterator alloc] initWithStandardBlock:block];
+    AsyncAwait *  iterator = [[AsyncAwait alloc] initWithStandardBlock:block];
     RJAsyncEpilog *  epilog = [[RJAsyncEpilog alloc] init];
     RJResult * __block result = nil;
     
